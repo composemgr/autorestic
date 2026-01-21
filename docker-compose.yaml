@@ -1,0 +1,34 @@
+# nginx proxy address - http://172.17.0.1:8112
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "5m"
+    max-file: "1"
+
+services:
+  autorestic:
+    image: autorestic/autorestic:latest
+    container_name: autorestic-app
+    restart: unless-stopped
+    logging: *default-logging
+    networks:
+      - autorestic
+    ports:
+      - "8112:8112"
+    environment:
+      TZ: ${TZ:-America/New_York}
+      PUID: ${SERVICE_USER:-1000}
+      PGID: ${SERVICE_GROUP:-1000}
+    volumes:
+      - ./rootfs/config/autorestic:/config
+      - ./rootfs/data/autorestic:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8112"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  autorestic:
+    external: false
