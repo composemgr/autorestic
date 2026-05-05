@@ -47,8 +47,8 @@ See `docker-compose.yaml` for complete list of configurable options.
 
 ## 📂 Volumes
 
-- `./rootfs/config/autorestic` - Data storage
-- `./rootfs/data/autorestic` - Data storage
+- `./volumes/config/autorestic` - Data storage
+- `./volumes/data/autorestic` - Data storage
 
 ## 🔍 Logging
 
