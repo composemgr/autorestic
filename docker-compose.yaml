@@ -1,5 +1,8 @@
-# nginx proxy address - http://172.17.0.1:8112
+# autorestic - High-level CLI backup tool wrapper for restic
+# Note: autorestic is a CLI tool, not a web service.
+# This container runs automated backups on a schedule.
 
+name: autorestic
 x-logging: &default-logging
   driver: json-file
   options:
@@ -8,26 +11,19 @@ x-logging: &default-logging
 
 services:
   autorestic:
-    image: autorestic/autorestic:latest
+    image: cupcakearmy/autorestic:latest
+    pull_policy: always
     container_name: autorestic-app
-    restart: unless-stopped
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
     logging: *default-logging
     networks:
       - autorestic
-    ports:
-      - "8112:8112"
     environment:
       TZ: ${TZ:-America/New_York}
-      PUID: ${SERVICE_USER:-1000}
-      PGID: ${SERVICE_GROUP:-1000}
     volumes:
-      - ./volumes/config/autorestic:/config
-      - ./volumes/data/autorestic:/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8112"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - ./volumes/config/autorestic:/root/.autorestic
+      - ./volumes/data/autorestic:/backup
 
 networks:
   autorestic:
