@@ -21,6 +21,7 @@ services:
       - autorestic
     environment:
       TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: autorestic-app
     volumes:
       - ./volumes/config/autorestic:/root/.autorestic
       - ./volumes/data/autorestic:/backup
@@ -28,3 +29,7 @@ services:
 networks:
   autorestic:
     external: false
+  proxy:
+    external: true
+  cloudflare:
+    external: true
