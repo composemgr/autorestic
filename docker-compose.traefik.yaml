@@ -1,0 +1,32 @@
+name: autorestic
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  autorestic:
+    image: cupcakearmy/autorestic:latest
+    container_name: autorestic-app
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    command: ['autorestic', '-c', '/root/.autorestic/.autorestic.yml', 'cron']
+    environment:
+      TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: autorestic-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+    volumes:
+      - './volumes/config/autorestic:/root/.autorestic'
+      - './volumes/data/autorestic:/backup'
+    networks:
+      - autorestic
+
+networks:
+  autorestic:
+    name: autorestic
+    external: false
+  traefik:
+    external: true

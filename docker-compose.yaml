@@ -1,35 +1,33 @@
-# autorestic - High-level CLI backup tool wrapper for restic
-# Note: autorestic is a CLI tool, not a web service.
-# This container runs automated backups on a schedule.
+# autorestic is a CLI backup tool - it has no web server and no exposed ports.
+# See the README for CLI usage examples.
 
 name: autorestic
 x-logging: &default-logging
-  driver: json-file
   options:
-    max-size: "5m"
-    max-file: "1"
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
 
 services:
   autorestic:
     image: cupcakearmy/autorestic:latest
-    pull_policy: always
     container_name: autorestic-app
     hostname: ${BASE_HOST_NAME:-$HOSTNAME}
     restart: always
+    pull_policy: always
     logging: *default-logging
-    networks:
-      - autorestic
+    command: ['autorestic', '-c', '/root/.autorestic/.autorestic.yml', 'cron']
     environment:
       TZ: ${TZ:-America/New_York}
       CONTAINER_NAME: autorestic-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
     volumes:
-      - ./volumes/config/autorestic:/root/.autorestic
-      - ./volumes/data/autorestic:/backup
+      - './volumes/config/autorestic:/root/.autorestic'
+      - './volumes/data/autorestic:/backup'
+    networks:
+      - autorestic
 
 networks:
   autorestic:
+    name: autorestic
     external: false
-  proxy:
-    external: true
-  cloudflare:
-    external: true
